@@ -22,12 +22,12 @@ int main(int argc, char *argv[]) {
 	int server_port = 0;
 	char server_ip[16] = "";
 	int stat;
-	
-	va_cli(argc, argv, server_ip, &server_port, &name);
 
-	int client_sock;
-	
+	int client_sock;	
 	struct sockaddr_in server_addr;
+	
+	// Check validity of input
+	va_cli(argc, argv, server_ip, &server_port, &name);
 	
 	// Construct socket
 	client_sock = socket(AF_INET, SOCK_STREAM, 0);

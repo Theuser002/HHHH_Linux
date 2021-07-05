@@ -4,6 +4,7 @@ int pipe_p2c[2];
 int pipe_c2p[2];
 int* figures;
 char name[100] = "";
+
 void equipMain(int client_sock);
 void commoditySales(int client_sock);
 void writeCache(int* figures);
@@ -38,7 +39,7 @@ int main(int argc, char *argv[]) {
 
 	// Request to connect server
 	if (connect(client_sock, (struct sockaddr*)&server_addr, sizeof(struct sockaddr)) < 0) {
-		printf("\nError! Can not connect to sever!\nClient exit imediately!\n");
+		printf("\nError! Cannot connect to sever!\nClient exit imediately!\n");
 		return 0;
 	}
 
@@ -54,14 +55,17 @@ int main(int argc, char *argv[]) {
 	
 	pid_t pid = fork();
 
-	if (pid == 0) {
+	if (pid == 0) { 
+		// Child process: Initiate a new session for a newcomer
 		equipMain(client_sock);
-	} else {
+	} else { 
+		// Parent process: Check for the numbers of figures
 		while(1) {
 			char stri[BUFF_SIZE];		
-			recv(client_sock, stri, BUFF_SIZE,0);
+			recv(client_sock, stri, BUFF_SIZE, 0);
 			int x;
 
+			// Read the figures in VM from the server
 			sscanf(stri, "%d", &x);
 			printf("\nCommodity delivery is in progress. Please wait for 10s.\n");
 			readCache(figures);
@@ -97,25 +101,24 @@ void equipMain(int client_sock) {
 		
 		scanf("%d", &c);
 		readCache(figures);
-				
+		
 		if (figures[c-1] <= 0 && c != 4){
 			printf("sold out!\n");
 			continue;
-		} else if (c != 4) figures[c-1] -= 1; 
+		} else if (c != 4) 
+			figures[c-1] -= 1; 
 
 		writeCache(figures);
 		switch(c) {
 			case 4:
 				menu_bye();
-				send(client_sock,
-							"shut_down", strlen("shut_down") + 1, 0);
+				send(client_sock, "shut_down", strlen("shut_down") + 1, 0);
 				kill(0, SIGKILL);
 				exit(0);
 		} // end switch menu home
 
 		char buff[BUFF_SIZE];
-		sprintf(buff,"%d",c-1);
-		
+		sprintf(buff, "%d", c-1);
 		
 		pipe(pipe_p2c);
 		pipe(pipe_c2p);

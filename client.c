@@ -96,26 +96,39 @@ void equipMain(int client_sock) {
 	while(1) {
 		menu_home(figures); 
 		int c;
-		char i;
 		fseek(stdin, 0, SEEK_END);
 		
 		scanf("%d", &c);
 		readCache(figures);
 		
-		if (figures[c-1] <= 0 && c != 4){
-			printf("sold out!\n");
-			continue;
-		} else if (c != 4) 
-			figures[c-1] -= 1; 
+		// if (figures[c-1] <= 0 && c != 4){
+		// 	printf("sold out!\n");
+		// 	continue;
+		// } else if (c != 4) 
+		// 	figures[c-1] -= 1; 
 
-		writeCache(figures);
+		// writeCache(figures);
 		switch(c) {
-			case 4:
+			case 0:
 				menu_bye();
 				send(client_sock, "shut_down", strlen("shut_down") + 1, 0);
 				kill(0, SIGKILL);
 				exit(0);
-		} // end switch menu home
+			case 1:
+			case 2:
+			case 3:
+				if (figures[c-1] <= 0) {
+					printf("Sold out!\n");
+					continue;
+				} else {
+					figures[c-1]--;
+					writeCache(figures);
+					break;
+				}
+			default:
+				printf("\nItem number not available!\nSelect from 1 to 3 to buy drinks, or 0 to exit.\n\n");
+				continue;
+		}
 
 		char buff[BUFF_SIZE];
 		sprintf(buff, "%d", c-1);

@@ -101,13 +101,6 @@ void equipMain(int client_sock) {
 		scanf("%d", &c);
 		readCache(figures);
 		
-		// if (figures[c-1] <= 0 && c != 4){
-		// 	printf("sold out!\n");
-		// 	continue;
-		// } else if (c != 4) 
-		// 	figures[c-1] -= 1; 
-
-		// writeCache(figures);
 		switch(c) {
 			case 0:
 				menu_bye();
@@ -143,18 +136,14 @@ void equipMain(int client_sock) {
 				perror("processGenerate fork");
 				exit(1);
 			case 0:
-				//printf("childProcess start\n");
 				commoditySales(client_sock);
 				exit(0);
 			default:
-				//printf("parentProcess start\n");
-
 				close(pipe_p2c[0]);
 				write(pipe_p2c[1], buff, strlen(buff) + 1);
 				close(pipe_p2c[1]);
 
 				wait(NULL);
-				
 				char tmp[BUFF_SIZE];
 				
 				close(pipe_c2p[1]);
@@ -162,8 +151,8 @@ void equipMain(int client_sock) {
 				close(pipe_c2p[0]);
 
 				printf("\n\n%s\n\n",tmp);
-		} // end switch fork()
-	} // end while
+		}
+	}
 }
 
 void commoditySales(int client_sock) {

@@ -67,7 +67,7 @@ int main(int argc, char *argv[]) {
 
 			// Read the figures in VM from the server
 			sscanf(stri, "%d", &x);
-			printf("\nCommodity delivery is in progress. Please wait for 10s.\n");
+			printf("\n\nCommodity delivery is in progress. Please wait for 10s.\n\n");
 			readCache(figures);
 			figures[x] += 10;
 			writeCache(figures);
@@ -111,7 +111,7 @@ void equipMain(int client_sock) {
 			case 2:
 			case 3:
 				if (figures[c-1] <= 0) {
-					printf("Sold out!\n");
+					printf("\nSold out!\n\n");
 					continue;
 				} else {
 					figures[c-1]--;
@@ -150,7 +150,7 @@ void equipMain(int client_sock) {
 				read(pipe_c2p[0], tmp, BUFF_SIZE);
 				close(pipe_c2p[0]);
 
-				printf("\n\n%s\n\n",tmp);
+				printf("\n%s\n",tmp);
 		}
 	}
 }

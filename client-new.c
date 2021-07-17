@@ -1,4 +1,6 @@
 #include "extra.h"
+#include "lib.h"
+#include "stdlib.h"
 
 typedef struct mess_buffer
 {
@@ -154,6 +156,8 @@ int main(int argc, char *argv[])
 
 	int client_sock;
 	struct sockaddr_in server_addr;
+	char max_drink_str[BUFF_SIZE];
+	int max_drink;
 
 	// Check validity of input
 	va_cli(argc, argv, server_ip, &server_port, &name);
@@ -178,53 +182,32 @@ int main(int argc, char *argv[])
 		printf("Cannot send machine's name\nClient exit imediately!\n");
 		return 0;
 	}
-	recv(client_sock, figures_str, BUFF_SIZE, 0);
+	recv(client_sock, figures_str, BUFF_SIZE, 0); //figures_str == quantities
 	sscanf(figures_str, "%d %d %d", figures, figures + 1, figures + 2);
 	writeCache(figures);
 	printf("Received figures from server %d %d %d\n", figures[0], figures[1], figures[2]);
+	
+	recv(client_sock, max_drink_str, BUFF_SIZE, 0);
+	max_drink = atoi(max_drink_str);
+	printf("Number of drinks: %d\n", max_drink);
+	
+	for (int i = 0; i < max_drink; i++){	
+		char stri[BUFF_SIZE];	
+		int x;
+		recv(client_sock, stri, BUFF_SIZE, 0);
+		if(atoi(stri) == NO_DELIVER){
 
-	pid_t pid = fork();
-
-	if (pid == 0)
-	{
-		// Child process: Initiate a new session for a newcomer
-		equipMain(client_sock);
-	}
-	else
-	{
-		// Parent process: If receive suppy, program will runs here
-		while (1)
-		{
-			char stri[BUFF_SIZE];
-			recv(client_sock, stri, BUFF_SIZE, 0);
-			int x;
-
+		}else{
+			printf("\nCommodity delivery is in progress. Please wait until delevering is finished.\n");
 			// Read the figures in VM from the server
 			sscanf(stri, "%d", &x);
-			printf("\nCommodity delivery is in progress. Please wait until delevering is finished.\n");
 			readCache(figures);
 			figures[x] += 10;
 			writeCache(figures);
-
-			kill(pid, SIGSTOP);
-			pid_t pid2 = fork();
-			if (pid2 == 0)
-			{
-				char i;
-				while (1){
-					scanf("%c", &i);
-				}
-			}
-
 			sleep(3);
-			fseek(stdin, 0, SEEK_END);
-			kill(pid2, SIGKILL);
-			menu_home(figures);
-			kill(pid, SIGCONT);
 		}
-		
 	}
-
+	equipMain(client_sock);
 	close(client_sock);
 	return 0;
 }

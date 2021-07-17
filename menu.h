@@ -6,5 +6,6 @@
 
 void menu_home();
 void menu_bye();
+void menu_user();
 	
 #endif

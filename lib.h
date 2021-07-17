@@ -23,10 +23,11 @@
 
 /*
  * database lib
+ * 
+ * #include <mysql.h>
  */
 
 #include <netdb.h>
-
 
 /*
  * signal - error
@@ -36,19 +37,18 @@
 #include <signal.h>
 #include <termios.h>
 
-
 /*
  * define size 
  */
 
 #define HUGE_BUFF_SIZE 8192
-#define BUFF_SIZE      2048
-#define BASE_LENGTH	256
+#define BUFF_SIZE 2048 //1 char = 1 byte
+#define BASE_LENGTH 256
 
-#define BACKLOG 10   // Number of allowed connections
-
+#define BACKLOG 10 // Number of allowed connections
+#define NO_DELIVER -1
 /*
  * file data name
  */
 
-#define salesHistory  "salesHistory.txt"
+#define salesHistory "salesHistory.txt"

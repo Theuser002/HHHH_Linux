@@ -1,9 +1,0 @@
-VM1	Pepsi	11
-VM1	Coca	11
-VM1	Lala	11
-VM2	Pepsi	8
-VM2	Coca	10
-VM2	Lala	10
-VM3	Pepsi	10
-VM3	Coca	10
-VM3	Lala	10

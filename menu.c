@@ -11,8 +11,6 @@ void menu_home(int* figures) {
 	printf(	"Your choice: "	);
 }
 
-void 
-menu_bye()
-{
-  printf("Bye\n");
+void menu_bye() {
+	printf("Bye\n");
 }

@@ -1,3 +1,0 @@
-0 Pepsi 0
-1 Coca 1
-2 Lala 2

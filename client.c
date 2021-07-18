@@ -1,7 +1,6 @@
 #include "extra.h"
 
-typedef struct mess_buffer
-{
+typedef struct mess_buffer {
 	long mesg_type;
 	char mesg_text[BUFF_SIZE];
 } message;
@@ -171,15 +170,24 @@ void commoditySales(int client_sock) {
 	send(client_sock, recv_str, strlen(recv_str) + 1, 0);
 }
 
-void writeCache(int* figures) {
+void writeCache(int *figures) {
 	char a[100] = "cache_";
-	FILE *f = fopen(strcat(a, name) , "w");
+	FILE *f = fopen(strcat(a, name), "w");
 	int i = 0;
-	while (i < 3){
+	while (i < 3) {
 		fprintf(f, "%d\n", figures[i]);
 		i++;
 	}
+	fclose(f);
+}
 
-	close(client_sock);
-	return 0;
+void readCache(int *figures) {
+	char a[100] = "cache_";
+	FILE *f = fopen(strcat(a, name), "r");
+	int i = 0;
+	while (i < 3) {
+		fscanf(f, "%d\n", figures + i);
+		i++;
+	}
+	fclose(f);
 }

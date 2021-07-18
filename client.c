@@ -16,136 +16,7 @@ void commoditySales(int client_sock);
 void writeCache(int *figures);
 void readCache(int *figures);
 
-void equipMain(int client_sock)
-{
-	while (1)
-	{
-		menu_home(figures);
-		char c_str[10];
-		char c_char;
-		int c;
-		char i;
-		fseek(stdin, 0, SEEK_END);
-
-		scanf("%s", &c_str);
-		c_char = c_str[0];
-		c = (int)(c_char - '0');
-
-		if (c < 0)
-		{
-			c = 0;
-		}
-
-		//Reading options
-		switch (c_char)
-		{
-			case '1':
-			case '2':
-			case '3':
-				if (figures[c - 1] <= 0)
-				{
-					printf("Sold out!");
-					continue;
-				}
-				else
-				{
-					figures[c - 1] -= 1;
-				}
-				break;
-			case '4':
-				menu_bye();
-				send(client_sock, "shut_down", strlen("shut_down") + 1, 0);
-				kill(0, SIGKILL);
-				exit(0);
-			default:
-				printf("Wrong option!\n");
-				break;
-		}
-
-		writeCache(figures);
-
-		char buff[BUFF_SIZE];
-		sprintf(buff, "%d", c - 1);
-
-		pipe(pipe_p2c);
-		pipe(pipe_c2p);
-
-		pid_t pid = 0;
-
-		switch (pid = fork())
-		{
-		case -1:
-			perror("processGenerate fork");
-			exit(1);
-		case 0:
-			//printf("childProcess start\n");
-			commoditySales(client_sock);
-			exit(0);
-		default:
-			//printf("parentProcess start\n");
-
-			close(pipe_p2c[0]);
-			write(pipe_p2c[1], buff, strlen(buff) + 1);
-			close(pipe_p2c[1]);
-
-			wait(NULL);
-
-			char tmp[BUFF_SIZE];
-
-			close(pipe_c2p[1]);
-			read(pipe_c2p[0], tmp, BUFF_SIZE);
-			close(pipe_c2p[0]);
-
-			printf("\n\n%s\n\n", tmp);
-		} // end switch fork()
-	}	  // end while
-}
-
-void commoditySales(int client_sock)
-{
-	char recv_str[BUFF_SIZE];
-
-	close(pipe_p2c[1]);
-	read(pipe_p2c[0], recv_str, BUFF_SIZE);
-	close(pipe_p2c[0]);
-
-	char send_str[BUFF_SIZE] = "Thank you for chosing us\n";
-
-	close(pipe_c2p[0]);
-	write(pipe_c2p[1], send_str, strlen(send_str) + 1);
-	close(pipe_c2p[1]);
-
-	send(client_sock, recv_str, strlen(recv_str) + 1, 0);
-}
-
-void writeCache(int *figures)
-{
-	char a[100] = "cache_";
-	FILE *f = fopen(strcat(a, name), "w");
-	int i = 0;
-	while (i < 3)
-	{
-		fprintf(f, "%d\n", figures[i]);
-		i++;
-	}
-	fclose(f);
-}
-
-void readCache(int *figures)
-{
-	char a[100] = "cache_";
-	FILE *f = fopen(strcat(a, name), "r");
-	int i = 0;
-	while (i < 3)
-	{
-		fscanf(f, "%d\n", figures + i);
-		i++;
-	}
-	fclose(f);
-}
-
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
 	figures = (int *)malloc(3 * sizeof(int));
 	char *figures_str = (char *)malloc(BUFF_SIZE);
 	int server_port = 0;
@@ -167,14 +38,12 @@ int main(int argc, char *argv[])
 	server_addr.sin_addr.s_addr = inet_addr(server_ip);
 
 	// Request to connect server
-	if (connect(client_sock, (struct sockaddr *)&server_addr, sizeof(struct sockaddr)) < 0)
-	{
+	if (connect(client_sock, (struct sockaddr *)&server_addr, sizeof(struct sockaddr)) < 0)	{
 		printf("\nError! Cannot connect to sever!\nClient exit imediately!\n");
 		return 0;
 	}
 
-	if (send(client_sock, name, 100, 0) < 0)
-	{
+	if (send(client_sock, name, 100, 0) < 0) {
 		printf("Cannot send machine's name\nClient exit imediately!\n");
 		return 0;
 	}
@@ -185,16 +54,12 @@ int main(int argc, char *argv[])
 
 	pid_t pid = fork();
 
-	if (pid == 0)
-	{
+	if (pid == 0) {
 		// Child process: Initiate a new session for a newcomer
 		equipMain(client_sock);
-	}
-	else
-	{
+	} else {
 		// Parent process: If receive suppy, program will runs here
-		while (1)
-		{
+		while (1) {
 			char stri[BUFF_SIZE];
 			recv(client_sock, stri, BUFF_SIZE, 0);
 			int x;
@@ -208,10 +73,9 @@ int main(int argc, char *argv[])
 
 			kill(pid, SIGSTOP);
 			pid_t pid2 = fork();
-			if (pid2 == 0)
-			{
+			if (pid2 == 0) {
 				char i;
-				while (1){
+				while (1) {
 					scanf("%c", &i);
 				}
 			}
@@ -222,7 +86,98 @@ int main(int argc, char *argv[])
 			menu_home(figures);
 			kill(pid, SIGCONT);
 		}
+	}
+	
+	close(client_sock);
+	return 0;
+}
+
+void equipMain(int client_sock) {
+	while(1) {
+		menu_home(figures); 
+		int c;
+		fseek(stdin, 0, SEEK_END);
 		
+		scanf("%d", &c);
+		readCache(figures);
+		
+		switch(c) {
+			case 0:
+				menu_bye();
+				send(client_sock, "shut_down", strlen("shut_down") + 1, 0);
+				kill(0, SIGKILL);
+				exit(0);
+			case 1:
+			case 2:
+			case 3:
+				if (figures[c-1] <= 0) {
+					printf("\nSold out!\n\n");
+					continue;
+				} else {
+					figures[c-1]--;
+					writeCache(figures);
+					break;
+				}
+			default:
+				printf("\nItem number not available!\nSelect from 1 to 3 to buy drinks, or 0 to exit.\n\n");
+				continue;
+		}
+
+		char buff[BUFF_SIZE];
+		sprintf(buff, "%d", c-1);
+		
+		pipe(pipe_p2c);
+		pipe(pipe_c2p);
+
+		pid_t pid = 0;
+			
+		switch (pid = fork()) {
+			case -1:
+				perror("processGenerate fork");
+				exit(1);
+			case 0:
+				commoditySales(client_sock);
+				exit(0);
+			default:
+				close(pipe_p2c[0]);
+				write(pipe_p2c[1], buff, strlen(buff) + 1);
+				close(pipe_p2c[1]);
+
+				wait(NULL);
+				char tmp[BUFF_SIZE];
+				
+				close(pipe_c2p[1]);
+				read(pipe_c2p[0], tmp, BUFF_SIZE);
+				close(pipe_c2p[0]);
+
+				printf("\n%s\n",tmp);
+		}
+	}
+}
+
+void commoditySales(int client_sock) {
+	char recv_str[BUFF_SIZE];
+
+	close(pipe_p2c[1]);
+	read(pipe_p2c[0], recv_str, BUFF_SIZE);
+	close(pipe_p2c[0]);
+
+	char send_str[BUFF_SIZE] = "Thank you for chosing us\n";
+
+	close(pipe_c2p[0]);
+	write(pipe_c2p[1], send_str, strlen(send_str) + 1);
+	close(pipe_c2p[1]);
+
+	send(client_sock, recv_str, strlen(recv_str) + 1, 0);
+}
+
+void writeCache(int* figures) {
+	char a[100] = "cache_";
+	FILE *f = fopen(strcat(a, name) , "w");
+	int i = 0;
+	while (i < 3){
+		fprintf(f, "%d\n", figures[i]);
+		i++;
 	}
 
 	close(client_sock);

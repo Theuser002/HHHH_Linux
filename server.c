@@ -62,7 +62,8 @@ int main(int argc, char *argv[])
 
 	char max_drink_str[BUFF_SIZE];
 
-	readDrinkInfo(all_drink, &max_drink); //read tu file csv vao va luu thong tin cua tat ca cac loai do uong vao all_drink, so luong cac loai do uong co trong kho vao max_drink
+	readDrinkInfo(all_drink, &max_drink); 
+	//read tu file csv vao va luu thong tin cua tat ca cac loai do uong vao all_drink, so luong cac loai do uong co trong kho vao max_drink
 
 	// Construct a TCP socket to listen connection request
 	if ((listen_sock = socket(AF_INET, SOCK_STREAM, 0)) == -1)

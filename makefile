@@ -8,7 +8,7 @@ all: ${PROGS}
 s: server.c drink.c extra.c inventory.c
 	$(CC) $(CFLAGS) -o $@ $^ 
 
-c: client.c menu.c drink.c extra.c
+c: client-new.c menu.c drink.c extra.c
 	$(CC) $(CFLAGS) -o $@ $^ 
 
 clean: *

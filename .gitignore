@@ -1,4 +1,5 @@
 cache_*
 c
 s
-*.txt
+inventoryInfo.txt
+salesHistory.txt

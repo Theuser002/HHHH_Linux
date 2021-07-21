@@ -13,11 +13,6 @@ int pipe_c2p[2];
 int *figures;
 char name[100] = "";
 
-void equipMain(int client_sock);
-void commoditySales(int client_sock);
-void writeCache(int *figures);
-void readCache(int *figures);
-
 void equipMain(int client_sock)
 {
 	while (1)
@@ -41,12 +36,17 @@ void equipMain(int client_sock)
 		//Reading options
 		switch (c_char)
 		{
+			case '0':
+				menu_bye();
+				send(client_sock, "shut_down", strlen("shut_down") + 1, 0);
+				kill(0, SIGKILL);
+				exit(0);
 			case '1':
 			case '2':
 			case '3':
 				if (figures[c - 1] <= 0)
 				{
-					printf("Sold out!");
+					printf("\nSold out!\n\n");
 					continue;
 				}
 				else
@@ -54,14 +54,9 @@ void equipMain(int client_sock)
 					figures[c - 1] -= 1;
 				}
 				break;
-			case '4':
-				menu_bye();
-				send(client_sock, "shut_down", strlen("shut_down") + 1, 0);
-				kill(0, SIGKILL);
-				exit(0);
 			default:
-				printf("Wrong option!\n");
-				break;
+				printf("\nWrong option!\n\n");
+				continue;
 		}
 
 		writeCache(figures);
@@ -98,7 +93,7 @@ void equipMain(int client_sock)
 			read(pipe_c2p[0], tmp, BUFF_SIZE);
 			close(pipe_c2p[0]);
 
-			printf("\n\n%s\n\n", tmp);
+			printf("\n%s\n\n", tmp);
 		} // end switch fork()
 	}	  // end while
 }
@@ -111,7 +106,7 @@ void commoditySales(int client_sock)
 	read(pipe_p2c[0], recv_str, BUFF_SIZE);
 	close(pipe_p2c[0]);
 
-	char send_str[BUFF_SIZE] = "Thank you for chosing us\n";
+	char send_str[BUFF_SIZE] = "Thank you for chosing us";
 
 	close(pipe_c2p[0]);
 	write(pipe_c2p[1], send_str, strlen(send_str) + 1);

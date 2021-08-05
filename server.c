@@ -24,8 +24,8 @@ void checkForDelivery(client_info *clt, int conn_sock)
 			if (quantity < MIN_QUANTITY)
 			{
 				printf("Quantity of the drink %s is %d, which is less than allowed, delivering supply to %s\n", brand, quantity, clt->name);
-				deliveryMng(conn_sock, j);
 				equipInfoAccess(2, j, &client_set[i]);
+				deliveryMng(conn_sock, j);
 			}else{
 				printf("Quantity of the drink %s is %d, which is fine, not delivering more of this drink to %s\n", brand, quantity, clt->name);
 				deliveryMng(conn_sock, NO_DELIVER);
@@ -200,6 +200,7 @@ void salesMng(int conn_sock, client_info *clt)
 int equipInfoAccess(int action, int num, client_info *clt)
 {
 	/* 
+	Interacting with the database
      action = 0: write history for bought
      action = 1: read quantities in database
      action = 2: write history and update inventory after delivery

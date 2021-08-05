@@ -13,11 +13,34 @@ int pipe_c2p[2];
 int *figures;
 char name[100] = "";
 
-void equipMain(int client_sock)
+void equipMain(int client_sock, int max_drink)
 {
+	/*Reading information from data base 
+	and display then allows the user to choose bewtween options*/
+
 	while (1)
 	{
+		//figures: current drinks and their quantities of the machine
+		
+		for (int i = 0; i < max_drink; i++){	
+			char stri[BUFF_SIZE];	
+			int x;
+			recv(client_sock, stri, BUFF_SIZE, 0);
+			if(atoi(stri) == NO_DELIVER){
+				printf("Nothing to deliver\n");
+			}else{
+				printf("\nCommodity delivery is in progress. Please wait until delevering is finished.\n");
+				// Read the figures in VM from the server
+				sscanf(stri, "%d", &x);
+				readCache(figures);
+				figures[x] += 10;
+				writeCache(figures);
+				sleep(3);
+			}
+		}
+
 		menu_home(figures);
+		//c: the user's choice, read from stdin
 		char c_str[10];
 		char c_char;
 		int c;
@@ -58,7 +81,6 @@ void equipMain(int client_sock)
 				printf("\nWrong option!\n\n");
 				continue;
 		}
-
 		writeCache(figures);
 
 		char buff[BUFF_SIZE];
@@ -71,31 +93,32 @@ void equipMain(int client_sock)
 
 		switch (pid = fork())
 		{
-		case -1:
-			perror("processGenerate fork");
-			exit(1);
-		case 0:
-			//printf("childProcess start\n");
-			commoditySales(client_sock);
-			exit(0);
-		default:
-			//printf("parentProcess start\n");
+			case -1:
+				perror("processGenerate fork");
+				exit(1);
+			case 0:
+				//printf("childProcess start\n");
+				commoditySales(client_sock);
+				exit(0);
+			default:
+				//printf("parentProcess start\n");
 
-			close(pipe_p2c[0]);
-			write(pipe_p2c[1], buff, strlen(buff) + 1);
-			close(pipe_p2c[1]);
+				close(pipe_p2c[0]);
+				write(pipe_p2c[1], buff, strlen(buff) + 1);
+				close(pipe_p2c[1]);
 
-			wait(NULL);
+				wait(NULL);
 
-			char tmp[BUFF_SIZE];
+				char tmp[BUFF_SIZE];
 
-			close(pipe_c2p[1]);
-			read(pipe_c2p[0], tmp, BUFF_SIZE);
-			close(pipe_c2p[0]);
+				close(pipe_c2p[1]);
+				read(pipe_c2p[0], tmp, BUFF_SIZE);
+				close(pipe_c2p[0]);
 
-			printf("\n%s\n\n", tmp);
+				printf("\n%s\n\n", tmp);
 		} // end switch fork()
 	}	  // end while
+
 }
 
 void commoditySales(int client_sock)
@@ -106,13 +129,14 @@ void commoditySales(int client_sock)
 	read(pipe_p2c[0], recv_str, BUFF_SIZE);
 	close(pipe_p2c[0]);
 
-	char send_str[BUFF_SIZE] = "Thank you for chosing us";
+	char send_str[BUFF_SIZE] = "Thank you for chosing us\n";
 
 	close(pipe_c2p[0]);
 	write(pipe_c2p[1], send_str, strlen(send_str) + 1);
 	close(pipe_c2p[1]);
 
 	send(client_sock, recv_str, strlen(recv_str) + 1, 0);
+
 }
 
 void writeCache(int *figures)
@@ -177,6 +201,7 @@ int main(int argc, char *argv[])
 		printf("Cannot send machine's name\nClient exit imediately!\n");
 		return 0;
 	}
+
 	recv(client_sock, figures_str, BUFF_SIZE, 0); //figures_str == quantities
 	sscanf(figures_str, "%d %d %d", figures, figures + 1, figures + 2);
 	writeCache(figures);
@@ -186,23 +211,7 @@ int main(int argc, char *argv[])
 	max_drink = atoi(max_drink_str);
 	printf("Number of drinks: %d\n", max_drink);
 	
-	for (int i = 0; i < max_drink; i++){	
-		char stri[BUFF_SIZE];	
-		int x;
-		recv(client_sock, stri, BUFF_SIZE, 0);
-		if(atoi(stri) == NO_DELIVER){
-
-		}else{
-			printf("\nCommodity delivery is in progress. Please wait until delevering is finished.\n");
-			// Read the figures in VM from the server
-			sscanf(stri, "%d", &x);
-			readCache(figures);
-			figures[x] += 10;
-			writeCache(figures);
-			sleep(3);
-		}
-	}
-	equipMain(client_sock);
+	equipMain(client_sock, max_drink);
 	close(client_sock);
 	return 0;
 }

@@ -20,12 +20,12 @@ void checkForDelivery(client_info *clt, int conn_sock)
 			}
 
 			int quantity = equipInfoAccess(1, j, &client_set[i]);
-			printf("Checking for dilivery of %s\n", clt->name);
+			printf("Checking for delivery of %s\n", clt->name);
 			if (quantity < MIN_QUANTITY)
 			{
 				printf("Quantity of the drink %s is %d, which is less than allowed, delivering supply to %s\n", brand, quantity, clt->name);
-				equipInfoAccess(2, j, &client_set[i]);
 				deliveryMng(conn_sock, j);
+				equipInfoAccess(2, j, &client_set[i]);
 			}else{
 				printf("Quantity of the drink %s is %d, which is fine, not delivering more of this drink to %s\n", brand, quantity, clt->name);
 				deliveryMng(conn_sock, NO_DELIVER);

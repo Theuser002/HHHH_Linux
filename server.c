@@ -42,14 +42,16 @@ void checkForDelivery(client_info *clt, int client_sock)
 				printf("Quantity of the drink %s is %d, which is less than allowed, delivering supply to %s\n", brand, quantity, clt->name);
 				deliveryMng(client_sock, j);
 				equipInfoAccess(2, j, &client_set[i]);
+				sleep(10);
 			}
 			else
 			{
 				printf("Quantity of the drink %s is %d, which is fine, not delivering more of this drink to %s\n", brand, quantity, clt->name);
 				deliveryMng(client_sock, NO_DELIVER);
+				sleep(3);
 			}
+			// sleep(3);
 		}
-		sleep(10);
 	}
 }
 
@@ -197,14 +199,14 @@ int main(int argc, char *argv[])
 		//Store drinks info to variable
 		readDrinkInfo(all_drink, &max_drink);
 
-		// Construct a TCP socket to listen to connection request from client
+		//Construct a TCP socket to listen to connection request from client
 		if ((server_sock = socket(AF_INET, SOCK_STREAM, 0)) == -1)
 		{
 			perror("\nError: ");
 			return 0;
 		}
 
-		// Bind address to socket
+		//Bind address to socket
 		bzero(&server, sizeof(server));
 		server.sin_family = AF_INET;
 		server.sin_port = htons(port);
@@ -215,13 +217,13 @@ int main(int argc, char *argv[])
 			perror("\nError: ");
 			return 0;
 		}
-		// Listen request from client
+		//Listen request from client
 		if (listen(server_sock, BACKLOG) == -1)
 		{
 			perror("\nError: ");
 			return 0;
 		}
-		// Communicate with client
+		//Communicate with client
 		while (1)
 		{
 			//Waiting for connection
@@ -280,7 +282,7 @@ int main(int argc, char *argv[])
 				exit(0);
 			}
 
-			// handing zombie state (slide cua co Linh mon Network Programming - 05-MultithreadTCPServer phan Forking Server)
+			//handing zombie state (slide cua co Linh mon Network Programming - 05-MultithreadTCPServer phan Forking Server)
 			signal(SIGCHLD, sig_child);
 			close(client_sock);
 		}

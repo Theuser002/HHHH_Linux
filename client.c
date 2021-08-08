@@ -21,11 +21,12 @@ void equipMain(int client_sock, int max_drink)
 	while (1)
 	{
 		//figures: current drinks and their quantities of the machine
-		
+		printf("TEST: Equipping main, client sock: %d\n", client_sock);
 		for (int i = 0; i < max_drink; i++){	
 			char stri[BUFF_SIZE];	
 			int x;
 			recv(client_sock, stri, BUFF_SIZE, 0);
+			printf("%s - ", stri);
 			if(atoi(stri) == NO_DELIVER){
 				printf("Nothing to deliver\n");
 			}else{
@@ -176,7 +177,7 @@ int main(int argc, char *argv[])
 
 	int client_sock;
 	struct sockaddr_in server_addr;
-	char max_drink_str[BUFF_SIZE];
+	char max_drink_str[BUFF_SIZE], is_approve[BUFF_SIZE];
 	int max_drink;
 
 	// Check validity of input
@@ -201,6 +202,19 @@ int main(int argc, char *argv[])
 	{
 		printf("Cannot send machine's name\nClient exit imediately!\n");
 		return 0;
+	}
+	
+	// Receive valid signal from server
+	int byte_receive = recv(client_sock, is_approve, BUFF_SIZE-1, 0);
+	is_approve[byte_receive] = '\0';
+
+	if (strcmp(is_approve, "DECLINE") == 0){
+		printf("Wrong client name or machine is in use!\n");
+		menu_bye();
+		kill(0, SIGKILL);
+		exit(0);
+	}else{
+		printf("Client name is valid.\n");
 	}
 
 	recv(client_sock, figures_str, BUFF_SIZE, 0); //figures_str == quantities

@@ -16,15 +16,7 @@ client_info client_set[] = {
   { .name = "VM3" }
 };
 
-int clientName2id(char *name){
-  int i = 0;
-  for (i = 0; i < MAX_CLIENTS; i++){
-    if(strcmp(name, client_set[i].name) == 0)
-      return i;
-  }
-  return -1;
-}
-
+int clientName2id(char *name);
 void connectMng();
 void salesMng(int conn_sock, client_info *clt);
 int equipInfoAccess(int action, int num, client_info *clt);

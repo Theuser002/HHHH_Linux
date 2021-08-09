@@ -217,6 +217,7 @@ int main(int argc, char *argv[])
 			perror("\nError: ");
 			return 0;
 		}
+		
 		//Listen request from client
 		if (listen(server_sock, BACKLOG) == -1)
 		{
@@ -235,6 +236,7 @@ int main(int argc, char *argv[])
 			
 			if ((pid = fork()) == 0)
 			{
+				close(server_sock);
 				char client_name[100] = "";
 
 				//Get socket number and client name via network

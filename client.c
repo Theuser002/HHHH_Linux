@@ -18,7 +18,7 @@ void equipMain(int client_sock, int max_drink)
 		for (int i = 0; i < max_drink; i++){	
 			recv(client_sock, stri, BUFF_SIZE, 0);
 			if(atoi(stri) == NO_DELIVER){
-				printf("Nothing to deliver\n");
+				// printf("Nothing to deliver\n");
 			}else{
 				printf("Commodity delivery is in progress. Please wait 10s...\n");
 				//Read the quantities in VM from the server

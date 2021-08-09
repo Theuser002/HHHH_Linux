@@ -23,5 +23,3 @@ int equipInfoAccess(int action, int num, client_info *clt);
 void deliveryMng(int conn_sock,int num);
 void checkForDelivery(client_info *clt, int conn_sock);
 client_info *findClient(char name[]);
-
-

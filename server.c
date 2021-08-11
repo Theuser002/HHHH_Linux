@@ -236,7 +236,7 @@ int main(int argc, char *argv[])
 			
 			if ((pid = fork()) == 0)
 			{
-				close(server_sock);
+				// close(server_sock);
 				char client_name[100] = "";
 
 				//Get socket number and client name via network
